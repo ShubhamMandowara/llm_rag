@@ -12,6 +12,12 @@ import os
 
 hf_api_key = st.sidebar.text_input("🔑 Enter Hugging Face API Key", type="password")
 
+# Streamlit UI
+st.title("📖 PDF Q&A Chatbot")
+st.write("Upload a PDF and ask questions based on its content!")
+
+# File uploader
+uploaded_file = st.file_uploader("Upload a PDF", type="pdf")
 if not hf_api_key:
     st.warning("Please enter your Hugging Face API key to proceed.")
     st.stop()
@@ -70,12 +76,7 @@ prompt = PromptTemplate(
 
 qa_chain = LLMChain(llm=llm, prompt=prompt)
 
-# Streamlit UI
-st.title("📖 PDF Q&A Chatbot")
-st.write("Upload a PDF and ask questions based on its content!")
 
-# File uploader
-uploaded_file = st.file_uploader("Upload a PDF", type="pdf")
 
 if uploaded_file:
     st.write("✅ PDF uploaded successfully!")
