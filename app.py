@@ -8,13 +8,15 @@ from langchain.llms import HuggingFaceHub
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import os
-os.environ["HUGGINGFACEHUB_API_TOKEN"] = st.secrets["HUGGINGFACEHUB_API_TOKEN"]
+
 
 hf_api_key = st.sidebar.text_input("🔑 Enter Hugging Face API Key", type="password")
 
-if not hf_api_key or os.environ["HUGGINGFACEHUB_API_TOKEN"]  is None:
+if not hf_api_key:
     st.warning("Please enter your Hugging Face API key to proceed.")
     st.stop()
+else:
+    os.environ["HUGGINGFACEHUB_API_TOKEN"] = hf_api_key
 
 
 
