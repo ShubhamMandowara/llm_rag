@@ -66,7 +66,7 @@ streamlit run app.py
 📂 pdf-qna-chatbot
 │── app.py              # Main Streamlit app
 │── requirements.txt    # Required dependencies
-│── .streamlit/         # Streamlit config folder (for secrets)
+│── secrets.toml         # Streamlit config folder (for secrets)
 ```
 
 ---
