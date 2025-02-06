@@ -1,26 +1,25 @@
-name: CI Pipeline
+name: CI Pipeline  # Name of the workflow
 
-on:
-  push:
+on: 
+  push:  # Trigger the workflow on push events
     branches:
       - main
-  pull_request:
+  pull_request:  # Trigger on PRs to main branch
     branches:
       - main
-    
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use latest Ubuntu runner
 
     steps:
-    - name: Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4  # GitHub action to fetch code
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-    -name: Install Dependency
-      run: pip install -r requirements.txt
-
+      - name: Install dependencies
+        run: pip install -r requirements.txt
