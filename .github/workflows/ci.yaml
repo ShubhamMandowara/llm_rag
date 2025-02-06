@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4 # fetch github code
-    
-    -name: Set up Python
-     uses: actions/setup-python@v4
-     with:
-        python-version: '3.12'
+    - name: Checkout repository
+        uses: actions/checkout@v4  # GitHub action to fetch code
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
 
     -name: Install Dependency
       run: pip install -r requirements.txt
