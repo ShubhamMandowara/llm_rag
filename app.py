@@ -8,6 +8,7 @@ from langchain.llms import HuggingFaceHub
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import os
+import uuid  # For unique file naming
 
 hf_api_key = st.sidebar.text_input("🔑 Enter Hugging Face API Key", type="password")
 
@@ -23,8 +24,15 @@ if not hf_api_key:
 else:
     os.environ["HUGGINGFACEHUB_API_TOKEN"] = hf_api_key
 
-if hf_api_key:
-    st.session_state.input_filled = True
+# Initialize session state for unique user isolation
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())  # Unique ID for each user session
+
+if "faiss_index" not in st.session_state:
+    st.session_state.faiss_index = None
+
+if "text_chunks" not in st.session_state:
+    st.session_state.text_chunks = None
 
 # Load embedding model
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -65,7 +73,7 @@ def retrieve_relevant_text(query, index, text_chunks, top_k=3):
     
     return [text_chunks[i] for i in indices[0]]
 
-# Load LLM (Replace with your own API key if needed)
+# Load LLM
 llm = HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.3", model_kwargs={"temperature": 0.5})
 
 # Define prompt
@@ -76,13 +84,13 @@ prompt = PromptTemplate(
 
 qa_chain = LLMChain(llm=llm, prompt=prompt)
 
-
-
+# Process uploaded PDF
 if uploaded_file and hf_api_key:
     st.write("✅ PDF uploaded successfully!")
 
-    # Save PDF locally
-    pdf_path = "uploaded.pdf"
+    # Create a unique file path for the user's session
+    pdf_path = f"uploaded_{st.session_state.session_id}.pdf"
+    
     with open(pdf_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
@@ -93,21 +101,24 @@ if uploaded_file and hf_api_key:
     # Combine text and tables
     all_text_data = extracted_text + "\n".join(extracted_tables)
 
-    # Create FAISS index
+    # Create FAISS index (store it per user session)
     index, text_chunks = create_faiss_index(all_text_data)
     
+    st.session_state.faiss_index = index
+    st.session_state.text_chunks = text_chunks
+
     st.success("✅ PDF processed! You can now ask questions.")
 
-    # User input for Q&A
-    user_question = st.text_input("Ask a question about the PDF:")
-    if user_question:
-        relevant_chunks = retrieve_relevant_text(user_question, index, text_chunks)
-        context = "\n".join(relevant_chunks)
-        
-        # Generate answer
-        answer = qa_chain.run({"context": context, "question": user_question})
-        
-        st.write("### Answer:")
-        st.write(answer)
+# User input for Q&A
+user_question = st.text_input("Ask a question about the PDF:")
+if user_question and st.session_state.faiss_index:
+    relevant_chunks = retrieve_relevant_text(user_question, st.session_state.faiss_index, st.session_state.text_chunks)
+    context = "\n".join(relevant_chunks)
+
+    # Generate answer
+    answer = qa_chain.run({"context": context, "question": user_question})
+
+    st.write("### Answer:")
+    st.write(answer)
 else:
-    st.warning("Please enter huggingface API Key and upload pdf file.")
+    st.warning("Please upload a PDF and enter a Hugging Face API Key.")
