@@ -110,4 +110,4 @@ if uploaded_file and hf_api_key:
         st.write("### Answer:")
         st.write(answer)
 else:
-    st.warning("Please enter huggingface API Key and pdf file both.")
+    st.warning("Please enter huggingface API Key and upload pdf file.")
