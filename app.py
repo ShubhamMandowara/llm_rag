@@ -9,7 +9,6 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import os
 
-
 hf_api_key = st.sidebar.text_input("🔑 Enter Hugging Face API Key", type="password")
 
 # Streamlit UI
@@ -24,7 +23,8 @@ if not hf_api_key:
 else:
     os.environ["HUGGINGFACEHUB_API_TOKEN"] = hf_api_key
 
-
+if hf_api_key:
+    st.session_state.input_filled = True
 
 # Load embedding model
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -78,7 +78,7 @@ qa_chain = LLMChain(llm=llm, prompt=prompt)
 
 
 
-if uploaded_file:
+if uploaded_file and hf_api_key:
     st.write("✅ PDF uploaded successfully!")
 
     # Save PDF locally
@@ -109,3 +109,5 @@ if uploaded_file:
         
         st.write("### Answer:")
         st.write(answer)
+else:
+    st.warning("Please enter huggingface API Key and pdf file both.")
